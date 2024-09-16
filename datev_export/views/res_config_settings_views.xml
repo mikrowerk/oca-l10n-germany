@@ -6,7 +6,7 @@
         <field name="priority" eval="100" />
         <field name="inherit_id" ref="account.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[@data-key='account']" position="inside">
+            <xpath expr="//block[@id='storno']" position="after">
                 <div id="datev_export">
 
                     <h2>DATEV Export</h2>

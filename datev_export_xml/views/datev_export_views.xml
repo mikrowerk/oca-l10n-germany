@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 # Copyright (C) 2022 initOS GmbH
 # Copyright (C) 2019 sewisoft (sewisoft.de)
@@ -10,66 +10,57 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 -->
 <odoo>
-
     <record id="datev_export_view_kanban" model="ir.ui.view">
         <field name="name">datev.export.xml.kanban</field>
         <field name="model">datev.export.xml</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
-                <field name="create_date" />
-                <field name="create_uid" />
-                <field name="date_stop" />
-                <field name="invoices_count" />
-                <field name="date_start" />
-                <field name="manually_document_selection" />
-                <field name="state" />
+                <field name="create_date"/>
+                <field name="create_uid"/>
+                <field name="date_stop"/>
+                <field name="invoices_count"/>
+                <field name="date_start"/>
+                <field name="manually_document_selection"/>
+                <field name="state"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click">
                             <div class="o_kanban_record_top mb8">
                                 <div class="o_kanban_record_headings mt4">
                                     <strong class="">
-                                        <field name="create_date" />
+                                        <field name="create_date"/>
                                         -
-                                        <field name="create_uid" />
+                                        <field name="create_uid"/>
                                     </strong>
                                 </div>
-
                             </div>
                             <div class="o_kanban_record_bottom">
-                                <span
-                                    t-if="record.manually_document_selection.raw_value == false"
-                                >Period:
-                                    <field name="date_start" />
+                                <span t-if="record.manually_document_selection.raw_value == false">
+                                    Period:
+                                    <field name="date_start"/>
                                     -
-                                    <field name="date_stop" />
+                                    <field name="date_stop"/>
                                 </span>
-                                <span
-                                    t-if="record.manually_document_selection.raw_value == true"
-                                >Manually Export:
-                                    <field name="invoices_count" />
+                                <span t-if="record.manually_document_selection.raw_value == true">
+                                    Manually Export:
+                                    <field name="invoices_count"/>
                                     Document(s)
                                 </span>
                             </div>
                             <div class="o_kanban_record_bottom mb4">
                                 <div class="oe_kanban_bottom_left text-muted">
-
                                 </div>
                                 <div class="oe_kanban_bottom_right">
-                                    <field
-                                        name="state"
-                                        widget="label_selection"
-                                        options="{'classes': {'pending': 'default', 'running': 'info', 'done': 'success', 'failed': 'danger'}}"
-                                    />
+                                    <field name="state"
+                                           options="{'classes': {'pending': 'default', 'running': 'info', 'done': 'success', 'failed': 'danger'}}"
+                                           widget="label_selection"/>
                                 </div>
                             </div>
                         </div>
                     </t>
                 </templates>
-            </kanban>
-        </field>
+            </kanban></field>
     </record>
-
     <record id="view_datev_export_form" model="ir.ui.view">
         <field name="name">datev.export.xml.form</field>
         <field name="model">datev.export.xml</field>
@@ -78,291 +69,181 @@
             <form create="1">
                 <header>
                     <!-- Run in Background buttons -->
-                    <button
-                        name="action_draft"
-                        type="object"
-                        string="Set to draft"
-                        attrs="{'invisible':  ['|', ('state', 'not in', ['done', 'pending', 'failed']), ('manually_document_selection', '=', True)]}"
-                        confirm="Do you really want to set the export to draft?"
-                    />
-                    <button
-                        name="action_pending"
-                        type="object"
-                        string="Ready for Export"
-                        attrs="{'invisible':  ['|', ('state', 'not in', ['draft']), ('manually_document_selection', '=', True)]}"
-                    />
-                    <button
-                        name="action_pending"
-                        type="object"
-                        string="Restart"
-                        attrs="{'invisible':  ['|', ('state', 'not in', ['done', 'failed']), ('manually_document_selection', '=', True)]}"
-                        confirm="Do you really want to restart the export?"
-                    />
-                    <button
-                        name="action_done"
-                        type="object"
-                        string="Set Done"
-                        attrs="{'invisible':  ['|', ('state', 'not in', ['running', 'failed']), ('manually_document_selection', '=', True)]}"
-                        confirm="Do you really want to set the export manually to 'Done'?"
-                    />
-
+                    <button confirm="Do you really want to set the export to draft?"
+                            invisible="state not in ['done', 'pending', 'failed'] or manually_document_selection == True"
+                            name="action_draft" string="Set to draft" type="object"/>
+                    <button invisible="state not in ['draft'] or manually_document_selection == True"
+                            name="action_pending" string="Ready for Export" type="object"/>
+                    <button confirm="Do you really want to restart the export?"
+                            invisible="state not in ['done', 'failed'] or manually_document_selection == True"
+                            name="action_pending" string="Restart" type="object"/>
+                    <button confirm="Do you really want to set the export manually to 'Done'?"
+                            invisible="state not in ['running', 'failed'] or manually_document_selection == True"
+                            name="action_done" string="Set Done" type="object"/>
                     <!-- Run in Foreground buttons -->
-                    <button
-                        string="Create DATEV Export File"
-                        name="export_zip"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible':  ['|', ('datev_file', '!=', False), ('manually_document_selection', '=', False)]}"
-                        confirm="The creation of the file can take some time! Do you really want to proceed!"
-                    />
-                    <button
-                        string="Recreate DATEV Export File"
-                        name="export_zip"
-                        type="object"
-                        class=""
-                        attrs="{'invisible': ['|', ('datev_file', '=', False), ('manually_document_selection', '=', False)]}"
-                        confirm="The creation of the file can take some time! Do you really want to create the DATEV file again?"
-                    />
-
-                    <field
-                        name="state"
-                        widget="statusbar"
-                        statusbar_visible="pending,running,done"
-                        attrs="{'invisible': [('manually_document_selection', '=', True)]}"
-                        statusbar_colors="{'done':'blue', 'failed':'red'}"
-                    />
+                    <button class="oe_highlight"
+                            confirm="The creation of the file can take some time! Do you really want to proceed!"
+                            invisible="datev_file != False or manually_document_selection == False" name="export_zip"
+                            string="Create DATEV Export File" type="object"/>
+                    <button class=""
+                            confirm="The creation of the file can take some time! Do you really want to create the DATEV file again?"
+                            invisible="datev_file == False or manually_document_selection == False" name="export_zip"
+                            string="Recreate DATEV Export File" type="object"/>
+                    <field invisible="manually_document_selection == True" name="state"
+                           statusbar_colors="{'done':'blue', 'failed':'red'}" statusbar_visible="pending,running,done"
+                           widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button
-                            class="oe_stat_button"
-                            name="action_show_related_invoices_view"
-                            icon="fa-usd"
-                            type="object"
-                        >
+                        <button class="oe_stat_button" icon="fa-usd" name="action_show_related_invoices_view"
+                                type="object">
                             <div class="o_form_field o_stat_info">
                                 <span class="o_stat_value">
-                                    <field name="invoices_count" />
+                                    <field name="invoices_count"/>
                                 </span>
-                                <span class="o_stat_text">Invoices</span>
+                                <span class="o_stat_text">
+                                    Invoices
+                                </span>
                             </div>
                         </button>
                     </div>
-                    <field name="manually_document_selection" invisible="1" />
+                    <field invisible="1" name="manually_document_selection"/>
                     <group>
                         <group string="Document Types">
-                            <field name="export_type" />
-                            <field name="export_invoice" string="Invoices" />
-                            <field name="export_refund" string="Refunds" />
+                            <field name="export_type"/>
+                            <field name="export_invoice" string="Invoices"/>
+                            <field name="export_refund" string="Refunds"/>
                         </group>
-                        <group
-                            string="Time Filters"
-                            attrs="{'invisible': [('manually_document_selection', '=', True)]}"
-                        >
-                            <field name="date_start" />
-                            <field name="date_stop" />
+                        <group invisible="manually_document_selection == True" string="Time Filters">
+                            <field name="date_start"/>
+                            <field name="date_stop"/>
                             <!-- <field name="period_id"/> -->
                         </group>
                     </group>
                     <group>
                         <group string="General Settings">
-                            <field
-                                name="client_number"
-                                attrs="{'invisible': [('client_number', '=', False)]}"
-                            />
-                            <field
-                                name="consultant_number"
-                                attrs="{'invisible': [('consultant_number', '=', False)]}"
-                            />
-                            <field
-                                name="company_id"
-                                attrs="{'invisible': [('manually_document_selection', '=', True)]}"
-                            />
-                            <field name="check_xsd" />
+                            <field invisible="client_number == False" name="client_number"/>
+                            <field invisible="consultant_number == False" name="consultant_number"/>
+                            <field invisible="manually_document_selection == True" name="company_id"/>
+                            <field name="check_xsd"/>
                         </group>
-                        <group string="Download File" col="1">
-                            <field name="datev_filename" invisible="1" />
+                        <group col="1" string="Download File">
+                            <field invisible="1" name="datev_filename"/>
                             <div>
-                                <span
-                                    attrs="{'invisible': [('datev_file', '!=', False)]}"
-                                >
+                                <span invisible="datev_file != False">
                                     <strong>
-                                        <big>
-                                            The zip file can be downloaded here after creation!
-                                        </big>
+
+                                        The zip file can be downloaded here after creation!
+
                                     </strong>
                                 </span>
-                                <span
-                                    attrs="{'invisible': [('datev_file', '=', False)]}"
-                                >
+                                <span invisible="datev_file == False">
                                     <span>
-                                        <big>
-                                            <big>
-                                                <field
-                                                    name="datev_file"
-                                                    filename="datev_filename"
-                                                    nolabel="1"
-                                                />
-                                                <i class="ml8">(<field
-                                                        name="datev_filesize"
-                                                    />)
-                                                </i>
-                                            </big>
-                                        </big>
+                                        <field filename="datev_filename" name="datev_file" nolabel="1"/>
+                                        <i class="ml8">
+                                            (
+                                            <field name="datev_filesize"/>
+                                            )
+                                        </i>
+
                                     </span>
                                 </span>
                             </div>
-
                             <div class="oe_grey">
-                                <i
-                                    class="fa fa-exclamation-triangle mr4"
-                                    aria-hidden="true"
-                                />
+                                <i aria-hidden="true" class="fa fa-exclamation-triangle mr4"/>
                                 Downloading large files may fail due to server settings!
                             </div>
                         </group>
                     </group>
-
-                    <group
-                        string="Exception Info"
-                        name="exception_info"
-                        attrs="{'invisible': [('exception_info', '=', False)]}"
-                    >
-                        <field
-                            name="exception_info"
-                            nolabel="1"
-                            colspan="2"
-                            class="alert alert-danger"
-                            role="alert"
-                        />
+                    <group invisible="exception_info == False" name="exception_info" string="Exception Info">
+                        <field class="alert alert-danger" colspan="2" name="exception_info" nolabel="1" role="alert"/>
                     </group>
-
-                    <group
-                        string="Manually Selected Documents"
-                        attrs="{'invisible': [('manually_document_selection', '=', False)]}"
-                    >
-                        <field name="invoice_ids" nolabel="1" colspan="2">
+                    <group invisible="manually_document_selection == False" string="Manually Selected Documents">
+                        <field colspan="2" name="invoice_ids" nolabel="1">
                             <tree editable="bottom">
-                                <field name="company_id" invisible="1" />
-                                <field name="partner_id" string="Partner" />
-                                <field name="invoice_date" />
-                                <field name="name" />
-                                <field name="invoice_date_due" />
-                                <field name="amount_total" />
-                                <field name="amount_residual" />
-                                <field name="currency_id" invisible="1" />
-                                <field name="state" />
-                                <field name="move_type" />
-                            </tree>
-                        </field>
+                                <field invisible="1" name="company_id"/>
+                                <field name="partner_id" string="Partner"/>
+                                <field name="invoice_date"/>
+                                <field name="name"/>
+                                <field name="invoice_date_due"/>
+                                <field name="amount_total"/>
+                                <field name="amount_residual"/>
+                                <field invisible="1" name="currency_id"/>
+                                <field name="state"/>
+                                <field name="move_type"/>
+                            </tree></field>
                     </group>
-
                 </sheet>
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" widget="mail_thread" />
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
                 </div>
-            </form>
-        </field>
+            </form></field>
     </record>
-
     <record id="view_datev_export_popup_form" model="ir.ui.view">
         <field name="name">datev.export.xml.popup.form</field>
         <field name="model">datev.export.xml</field>
         <field name="priority">50</field>
         <field name="mode">primary</field>
-        <field name="inherit_id" ref="view_datev_export_form" />
+        <field name="inherit_id" ref="view_datev_export_form"/>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <header position="attributes">
                 <attribute name="invisible">1</attribute>
             </header>
-
             <sheet position="inside">
                 <footer>
                     <!-- Run in Background buttons -->
-                    <button
-                        string="Create Export File"
-                        name="export_zip"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible':  ['|', ('datev_file', '!=', False), ('manually_document_selection', '=', True)]}"
-                        confirm="The creation of the file will be done in background and may take some time! When the file is created or an exception occurs, an activity will be applied to you."
-                    />
-
-                    <button
-                        string="Recreate Export File"
-                        name="export_zip"
-                        type="object"
-                        class=""
-                        attrs="{'invisible': ['|', ('datev_file', '=', False), ('manually_document_selection', '=', True)]}"
-                        confirm="Do you really want to create the DATEV file again? The creation of the file will be done in background and may take some time! When the file is created or an exception occurs, an activity will be applied to you."
-                    />
-
+                    <button class="oe_highlight"
+                            confirm="The creation of the file will be done in background and may take some time! When the file is created or an exception occurs, an activity will be applied to you."
+                            invisible="datev_file != False or manually_document_selection == True" name="export_zip"
+                            string="Create Export File" type="object"/>
+                    <button class=""
+                            confirm="Do you really want to create the DATEV file again? The creation of the file will be done in background and may take some time! When the file is created or an exception occurs, an activity will be applied to you."
+                            invisible="datev_file == False or manually_document_selection == True" name="export_zip"
+                            string="Recreate Export File" type="object"/>
                     <!-- Run in Foreground buttons -->
-                    <button
-                        string="Create Export File"
-                        name="export_zip"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible':  ['|', ('datev_file', '!=', False), ('manually_document_selection', '=', False)]}"
-                        confirm="The creation of the file can take some time! Do you really want to proceed!"
-                    />
-
-                    <button
-                        string="Recreate Export File"
-                        name="export_zip"
-                        type="object"
-                        class=""
-                        attrs="{'invisible': ['|', ('datev_file', '=', False), ('manually_document_selection', '=', False)]}"
-                        confirm="The creation of the file can take some time! Do you really want to create the DATEV file again?"
-                    />
-
+                    <button class="oe_highlight"
+                            confirm="The creation of the file can take some time! Do you really want to proceed!"
+                            invisible="datev_file != False or manually_document_selection == False" name="export_zip"
+                            string="Create Export File" type="object"/>
+                    <button class=""
+                            confirm="The creation of the file can take some time! Do you really want to create the DATEV file again?"
+                            invisible="datev_file == False or manually_document_selection == False" name="export_zip"
+                            string="Recreate Export File" type="object"/>
                     <!-- Special Buttons -->
-                    <button string="Close" class="oe_link" special="cancel" />
+                    <button class="oe_link" special="cancel" string="Close"/>
                 </footer>
-            </sheet>
-        </field>
+            </sheet></field>
     </record>
-
     <record id="action_datev_export_wizard" model="ir.actions.act_window">
         <field name="name">DATEV XML Export Wizard</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">datev.export.xml</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_datev_export_popup_form" />
+        <field name="view_id" ref="view_datev_export_popup_form"/>
         <field name="target">new</field>
     </record>
-
     <record id="datev_export_view_tree" model="ir.ui.view">
         <field name="name">datev.export.xml.view.tree</field>
         <field name="model">datev.export.xml</field>
         <field name="arch" type="xml">
-            <tree
-                create="1"
-                default_order="id desc"
-                decoration-muted="state in ['draft', 'pending']"
-                decoration-danger="state == 'failed'"
-                decoration-success="state == 'running'"
-            >
-
-                <field name="create_date" />
-                <field name="create_uid" />
-                <field name="export_type" />
-                <field name="manually_document_selection" invisible="True" />
-                <field name="date_start" />
-                <field name="date_stop" />
-                <field name="datev_file" filename="datev_filename" widget="binary" />
-                <field name="datev_filesize" />
-                <field name="datev_filename" invisible="1" />
-                <field name="invoices_count" />
-                <field name="state" />
-            </tree>
-        </field>
+            <tree create="1" decoration-danger="state == 'failed'" decoration-muted="state in ['draft', 'pending']"
+                  decoration-success="state == 'running'" default_order="id desc">
+                <field name="create_date"/>
+                <field name="create_uid"/>
+                <field name="export_type"/>
+                <field invisible="True" name="manually_document_selection"/>
+                <field name="date_start"/>
+                <field name="date_stop"/>
+                <field filename="datev_filename" name="datev_file" widget="binary"/>
+                <field name="datev_filesize"/>
+                <field invisible="1" name="datev_filename"/>
+                <field name="invoices_count"/>
+                <field name="state"/>
+            </tree></field>
     </record>
-
-
     <record id="action_datev_export" model="ir.actions.act_window">
         <field name="name">DATEV XML Export</field>
         <field name="type">ir.actions.act_window</field>
@@ -379,22 +260,14 @@
             </p>
         </field>
     </record>
-
-    <menuitem
-        name="DATEV XML Export"
-        parent="account.menu_finance_reports"
-        id="menu_datev_export_categ"
-        sequence="120"
-        action="action_datev_export"
-    />
-
+    <menuitem action="action_datev_export" id="menu_datev_export_categ" name="DATEV XML Export"
+              parent="account.menu_finance_reports" sequence="120"/>
     <record id="action_invoice_datev_export" model="ir.actions.server">
         <field name="name">DATEV XML Export</field>
-        <field name="model_id" ref="model_datev_export_xml" />
+        <field name="model_id" ref="model_datev_export_xml"/>
         <field name="state">code</field>
         <field name="code">action = model.export_zip_invoice()</field>
-        <field name="binding_model_id" ref="account.model_account_move" />
-        <field name="groups_id" eval="[(4, ref('account.group_account_manager'))]" />
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field eval="[(4, ref('account.group_account_manager'))]" name="groups_id"/>
     </record>
-
 </odoo>

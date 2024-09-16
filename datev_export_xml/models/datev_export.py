@@ -66,32 +66,32 @@ class DatevExport(models.Model):
         [("out", _("Customers")), ("in", _("Vendors"))],
         default="out",
         required=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #   states={"draft": [("readonly", False)]},
     )
     export_invoice = fields.Boolean(
         "Export Invoices",
         default=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #  states={"draft": [("readonly", False)]},
     )
     export_refund = fields.Boolean(
         "Export Refunds",
         default=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #  states={"draft": [("readonly", False)]},
     )
     date_start = fields.Date(
         "From Date",
         default=_default_start,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #  states={"draft": [("readonly", False)]},
     )
     date_stop = fields.Date(
         "To Date",
         default=_default_stop,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #  states={"draft": [("readonly", False)]},
     )
     company_id = fields.Many2one(
         "res.company",
@@ -107,8 +107,8 @@ class DatevExport(models.Model):
         "Check XSD",
         required=True,
         default=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        readonly=False,
+        #  states={"draft": [("readonly", False)]},
     )
     attachment_id = fields.Many2one(
         comodel_name="ir.attachment", string="Attachment", required=False, readonly=True
@@ -254,6 +254,7 @@ class DatevExport(models.Model):
         A Cron job can't execute parallel, so if we run this cron and there is
         currently a running datev export we can restart it.
         """
+        _logger.info("Cron job started for DATEV export")
         hanging_datev_exports = self.search(
             [("state", "=", "running"), ("manually_document_selection", "=", False)]
         )
@@ -263,9 +264,13 @@ class DatevExport(models.Model):
             limit=1,
         )
         if datev_export:
+            _logger.info("Have one export pending, will execute now")
             datev_export.with_user(datev_export.create_uid.id).get_zip()
             datev_export._create_activity()
             datev_export.invoice_ids.write({"datev_exported": True})
+            _logger.info("Datev export completed")
+        else:
+            _logger.info("No export currently pending, will re-check after some time")
         return True
 
     def export_zip(self):
